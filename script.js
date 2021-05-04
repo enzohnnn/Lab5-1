@@ -88,11 +88,11 @@ function readBut(event) {
   var currVal = bar.value;
   var topT = document.getElementById('text-top');
   var botT = document.getElementById('text-bottom');
-  console.log(topT.value);
-  console.log(botT.value);
-  
+  //console.log(topT.value);
+  //console.log(botT.value);
+  var combinedT = topT.value + botT.value;
   //assign string to object "utter"
-  var utter = new SpeechSynthesisUtterance(topT.value, botT.value);
+  var utter = new SpeechSynthesisUtterance(combinedT);
   window.speechSynthesis.cancel();
 
 //volume slider
