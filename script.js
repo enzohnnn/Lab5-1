@@ -90,6 +90,7 @@ function readBut(event) {
   var botT = document.getElementById('text-bottom');
   console.log(topT.value);
   console.log(botT.value);
+  
   //assign string to object "utter"
   var utter = new SpeechSynthesisUtterance(topT.value, botT.value);
   window.speechSynthesis.cancel();
@@ -123,7 +124,7 @@ function readBut(event) {
       utter.voice = voices[i];
     }
   }
-  
+
   //SPEAK
   synth.speak(utter);
   
