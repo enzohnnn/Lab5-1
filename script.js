@@ -85,13 +85,46 @@ submitButton.addEventListener('submit', subBut);
 
 //read button, reads top and bottom text
 function readBut(event) {
+  var currVal = bar.value;
   var topT = document.getElementById('text-top');
   var botT = document.getElementById('text-bottom');
   console.log(topT.value);
   console.log(botT.value);
-  //read top and bottom text
+  //assign string to object "utter"
   var utter = new SpeechSynthesisUtterance(topT.value, botT.value);
   window.speechSynthesis.cancel();
+
+//volume slider
+  if(currVal > 90) {
+    //update volume value
+    utter.volume = 1;
+  } else if(currVal > 70) {
+    //update volume value
+    utter.volume = 0.75;
+  } else if(currVal > 50) {
+    //update volume value
+    utter.volume = 0.55;
+  } else if(currVal > 35) {
+    //update volume value
+    utter.volume = 0.33;
+  }else if(currVal > 0) {
+    //update volume value
+    utter.volume = 0.20;
+  }else {
+    //update volume value
+    utter.volume = 0;
+  }
+  event.preventDefault();
+  //choose voice
+  var voices = synth.getVoices();
+  var selectedOption = voiceSelect.selectedOptions[0].getAttribute('data-name');
+  for(var i = 0; i < voices.length ; i++) {
+    if(voices[i].name === selectedOption) {
+      utter.voice = voices[i];
+    }
+  }
+  
+  //SPEAK
   synth.speak(utter);
   
   sButton.disabled = true;
@@ -120,13 +153,15 @@ function updateValue(event) {
   if(currVal > 67) {
     //update volume icon
     volImg.src = "icons/volume-level-3.svg";
-    //update volume value
-
   } else if(currVal > 33) {
+    //update volume icon
     volImg.src = "icons/volume-level-2.svg";
   } else if(currVal > 0) {
+    //update volume icon
     volImg.src = "icons/volume-level-1.svg";
+  
   } else {
+    //update volume icon
     volImg.src = "icons/volume-level-0.svg";
   }
   event.preventDefault();
