@@ -2,32 +2,69 @@
 
 const img = new Image(); // used to load image from <input> and draw to canvas
 
-// Fires whenever the img object loads a new image (such as with img.src =)
+
 const canvas = document.getElementById('user-image');
 const can = canvas.getContext('2d');
 var sButton = document.querySelector('button[type="submit"]');
 var rButton = document.querySelector('button[type="reset"]');
 var tButton = document.querySelector('button[type="button"]');
+//voice options
+var optionButton = document.getElementById("voice-selection");
+//text to speech object
+var synth = window.speechSynthesis;
+//to populate voice list
+var inputForm = document.querySelector('form');
+var inputTxt = document.querySelector('input');
+var voiceSelect = document.querySelector('select');
 
+
+// Fires whenever the img object loads a new image (such as with img.src =)
 img.addEventListener('load', () => {
-  // TODO
-
-  // Some helpful tips:
-  // - Fill the whole Canvas with black first to add borders on non-square images, then draw on top
-  // - Clear the form when a new image is selected
-  // - If you draw the image to canvas here, it will update as soon as a new image is selected
+//clear canvas
   can.clearRect(0, 0, canvas.width, canvas.height);
+  //fill with black
   can.fillStyle = "black";
   can.fillRect(0, 0, canvas.width, canvas.height);
+  //get dimensions
   var list = getDimmensions(canvas.width, canvas.height, img.width, img.height);
+  //draw image to canvas
   can.drawImage(img, list['startX'], list['startY'], list['width'], list['height']);
   can.globalCompositeOperation = 'source-over';
 });
+//load img.src
 var picture = document.getElementById('image-input');
 picture.addEventListener('change', ()=> {
   img.src = picture.value.replace("C:\\fakepath\\", "");
 });
 
+//POPULATE VOICE LIST
+optionButton.disabled = false;
+var select = document.getElementById("voice-selection");
+
+function populateVoiceList() {
+  var voices = synth.getVoices();
+
+  for(var i = 0; i < voices.length ; i++) {
+    var option = document.createElement('option');
+    option.textContent = voices[i].name + ' (' + voices[i].lang + ')';
+
+    if(voices[i].default) {
+      option.textContent += ' -- DEFAULT';
+    }
+
+    option.setAttribute('data-lang', voices[i].lang);
+    option.setAttribute('data-name', voices[i].name);
+    voiceSelect.appendChild(option);
+  }
+}
+
+populateVoiceList();
+if (speechSynthesis.onvoiceschanged !== undefined) {
+  speechSynthesis.onvoiceschanged = populateVoiceList;
+}
+//END POPULATE VOICE LIST
+
+//submit button, creates meme
 function subBut(event) {
   var topT = document.getElementById('text-top');
   var botT = document.getElementById('text-bottom');
@@ -41,10 +78,32 @@ function subBut(event) {
   tButton.disabled = false;
   event.preventDefault();
 }
-
+//call subBut when button is clicked
 var submitButton = document.getElementById('generate-meme');
 submitButton.addEventListener('submit', subBut);
 
+
+//read button, reads top and bottom text
+function readBut(event) {
+  var topT = document.getElementById('text-top');
+  var botT = document.getElementById('text-bottom');
+  console.log(topT.value);
+  console.log(botT.value);
+  //read top and bottom text
+  var utter = new SpeechSynthesisUtterance(topT.value, botT.value);
+  window.speechSynthesis.cancel();
+  synth.speak(utter);
+  
+  sButton.disabled = true;
+  rButton.disabled = false;
+  tButton.disabled = false;
+  event.preventDefault();
+}
+//call readBut when button is clicked
+var readButton = document.querySelector('button[type="button"]');
+readButton.addEventListener('click', readBut);
+
+//clear button
 function clearBut(event) {
   can.clearRect(0, 0, canvas.width, canvas.height);
   sButton.disabled = false;
@@ -55,10 +114,14 @@ function clearBut(event) {
 //var clearButton = document.getElementById
 rButton.addEventListener('click', clearBut);
 
+//volume slider
 function updateValue(event) {
   var currVal = bar.value;
   if(currVal > 67) {
+    //update volume icon
     volImg.src = "icons/volume-level-3.svg";
+    //update volume value
+
   } else if(currVal > 33) {
     volImg.src = "icons/volume-level-2.svg";
   } else if(currVal > 0) {
@@ -72,6 +135,7 @@ function updateValue(event) {
 var bar = document.querySelector('input[type="range"]');
 var volImg = document.querySelector('img');
 bar.addEventListener('input', updateValue);
+
 
 /**
  * Takes in the dimensions of the canvas and the new image, then calculates the new
